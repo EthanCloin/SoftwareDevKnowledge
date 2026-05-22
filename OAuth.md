@@ -63,3 +63,55 @@ Use the authorization_code grant type which we can exchange for an access token.
 # Authorization Code Grant
 User authorizes and is redirected with a temporary code. Application can exchange that for an Access Token
 Recommended that all OAuth services use [[PKCE]] security standard. This is where 'challenge' comes into play, need to dig into that.
+## Example Flow
+App initiates by building a URL containing client ID, scope, state and PKCE code verifier. This goes in an anchor tag so the browser will redirect user to the OAuth server.
+User approves. OAuth server redirects back to the app including `code` in the URL.
+App exchanges `code` for an AccessToken.
+## Possible Errors
+Upon error, the redirect URL always contains a `error` param and may include `error_description` or `error_uri`
+## User Experience Considerations
+Authorization page cannot be an embed or iframe. User couldn't verify against phishing.
+Native mobile apps and SPAs don't require `client_secret` param bc they can't protect that value.
+# Single-Page Apps
+Best option for SPAs is to utilize PKCE extension.
+SPAs will communicate directly with the OAuth server.
+## Authorization
+App sends user to `/authorize` endpoint of OAuth server
+### Authorization Grant Parameters
+- `response_type`
+- `client_id`
+- `redirect_uri`
+- `scope`
+- `state`
+App exchanges `code` in response for AccessToken
+## Implicit Flow
+This protocol was made to get around a former limitation of browsers. Previously, could not make requests to other domains. Now we have CORS config to allow that.
+## Security Considerations for Single-Page Apps
+Cross Site Scripting (XSS) is a concern in SPAs. Policies around token lifetimes can help mitigate risk here.
+### Refresh Tokens
+A stolen RefreshToken is more dangerous than a stolen AccessToken. 
+If the OAuth server permits sending a RefreshToken to a SPA, must abide by a few guidelines to mitigate risk.
+- Each RefreshToken is valid for only one use.
+- Auth server must issue a new RefreshToken each time one is utilized to get a new AccessToken.
+### Storing Tokens
+We need to hang onto the Access/Refresh Tokens. Can go in LocalStorage but then any other app can access those values. (what about Http-Only cookies?)
+### Choosing an Alternative Architecture
+If you have a web server backend in C# or Java or whatever, use that to handle the OAuth flow. You can safely store a secret and eliminate a lot of vulnerabilities.
+# Mobile and Native Apps
+i'm skipping this for now. only care ab web atm.
+# Making Authenticated Requests
+Put the AccessToken in the Authorization header
+Don't try to parse the AccessToken, consider it opaque to the client.
+Client does need to handle the refresh flow when the AccessToken expires.
+## Refresh Tokens
+kinda already talked ab this
+## Registering an Application
+Now we are thinking about what an implementation of an OAuth server is responsible for. Clients who want access must have the ability to register an application and generate their client_id and client_secret. 
+
+Different implementations vary, but keep in mind that mobile+SPA clients should not have a client_secret assigned. 
+## Client ID and Secret
+Protect the secret judiciously. Obscure it in the webpage, only save hashed/encrypted versions.
+## Deleting Applications and Revoking Secrets
+Deleting an application should immediately **revoke all access tokens**.
+Revoking a secret is the process a developer can use to reset an exposed client_secret.
+
