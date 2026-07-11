@@ -9,7 +9,13 @@ The goal of this project is to build a fully featured authentication server. The
 - OIDC
 
 _Will need to flesh out which of these are authentication methods vs frameworks vs protocols as I learn more_
-
+Also for login should support the following behaviors and methods:
+- password login
+- one-time password login
+- password reset
+- Sign in with Google
+- verify email address
+- save a passkey
 ## JWT Stuff
 
 As I understand, the JWT Bearer auth method is as follows.
@@ -31,3 +37,4 @@ This is the party who has the user data which the Client wants access to. It's r
 # Resources
 https://www.jwt.io/introduction#what-is-json-web-token-structure
 https://www.oauth.com/
+https://ierostenko.medium.com/the-complete-guide-to-modern-authentication-and-authorization-architecture-c2d86c1fcad2
